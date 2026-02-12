@@ -1,0 +1,17 @@
+# Ignore Node.js (Frontend)
+cms-frontend/node_modules/
+cms-frontend/dist/
+cms-frontend/.env
+cms-frontend/.env.local
+
+# Ignore Java/Maven (Backend)
+complaint-mng-sys/target/
+complaint-mng-sys/.mvn/wrapper/maven-wrapper.jar
+complaint-mng-sys/*.log
+complaint-mng-sys/.classpath
+complaint-mng-sys/.project
+complaint-mng-sys/.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
