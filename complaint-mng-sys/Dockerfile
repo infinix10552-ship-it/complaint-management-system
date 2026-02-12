@@ -7,7 +7,7 @@ COPY . /app
 RUN if [ -f ./mvnw ]; then chmod +x ./mvnw && ./mvnw -B -DskipTests package; else mvn -B -DskipTests package; fi
 
 # Use a small JRE image to run the app
-FROM eclipse-temurin:21-jre-focal
+FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
