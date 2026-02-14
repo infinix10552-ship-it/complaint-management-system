@@ -53,31 +53,31 @@ public class ComplaintController {
 
 
 
-        @PostMapping("/complaints")
-        public ResponseEntity<Complaint> create(@RequestBody ComplaintRequest request) {
-            Complaint created = complaintService.createComplaint(request);
-            return new ResponseEntity<>(created, HttpStatus.CREATED);
-        }
-
-        @GetMapping("/complaints/my/{userId}")
-            public List<Complaint> myComplaints(@PathVariable Long userId) {
-            return complaintService.getUserComplaints(userId);
+    @PostMapping("/complaints")
+    public ResponseEntity<Complaint> create(@RequestBody ComplaintRequest request) {
+        Complaint created = complaintService.createComplaint(request);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
-        @GetMapping("/complaints/{id}")
-            public Complaint getOne(@PathVariable Long id) {
-            return complaintService.getComplaint(id);
+    @GetMapping("/complaints/my/{userId}")
+    public List<Complaint> myComplaints(@PathVariable Long userId) {
+        return complaintService.getUserComplaints(userId);
     }
 
-        @GetMapping("/admin/complaints/all")
-            public List<Complaint> getAll() {
-            return complaintService.getAllComplaints();
+    @GetMapping("/complaints/{id}")
+    public Complaint getOne(@PathVariable Long id) {
+        return complaintService.getComplaint(id);
     }
 
-        @PutMapping("/admin/complaints/{id}/status")
-            public ResponseEntity<Complaint> updateStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest request) {
-            Complaint updated = complaintService.updateStatus(id, request.status);
-            return new ResponseEntity<>(updated, HttpStatus.OK);
+    @GetMapping("/admin/complaints/all")
+    public List<Complaint> getAll() {
+        return complaintService.getAllComplaints();
+    }
+
+    @PutMapping("/admin/complaints/{id}/status")
+    public ResponseEntity<Complaint> updateStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest request) {
+        Complaint updated = complaintService.updateStatus(id, request.status);
+        return new ResponseEntity<>(updated, HttpStatus.OK);
     }
 
 }
