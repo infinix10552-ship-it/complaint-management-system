@@ -11,3 +11,8 @@ INSERT INTO complaint (title, description, category, created_at, complaint_statu
 ('Broken street light', 'Street light outside building not working', 'Infrastructure', '2026-02-05 21:00:00', 'REJECTED', 2);
 
 
+
+
+
+
+
