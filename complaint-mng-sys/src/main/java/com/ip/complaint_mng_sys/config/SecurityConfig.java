@@ -45,10 +45,17 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("https://complaint-management-system-ashen.vercel.app/login")); // Frontend URL
+        // Allow all Vercel frontend deployments and localhost for development
+        configuration.setAllowedOrigins(Arrays.asList(
+                "https://complaint-management-system-ashen.vercel.app",
+                "https://complaint-management-system-infinix10552-ship-its-projects.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:5173"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache CORS preflight for 1 hour
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
