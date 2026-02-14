@@ -25,8 +25,8 @@ services:
           property: password
       - key: JWT_SECRET
         sync: false  # Set this manually in Render dashboard
-      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
-        value: "validate" # Use 'update' only during development
+      - key: DDL_AUTO
+        value: "create" # Creates tables on first deployment, then change to 'update' after successful deployment
 
 databases:
   - name: complaint-db
