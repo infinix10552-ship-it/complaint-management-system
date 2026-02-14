@@ -27,6 +27,8 @@ services:
         sync: false  # Set this manually in Render dashboard
       - key: DDL_AUTO
         value: "create" # Creates tables on first deployment, then change to 'update' after successful deployment
+      - key: SPRING_JPA_HIBERNATE_DDL_AUTO
+        value: "create"
 
 databases:
   - name: complaint-db
@@ -35,3 +37,5 @@ databases:
     plan: free
     postgreSQL: false # Set to true if using PostgreSQL
     # For MySQL, you'll need to configure the connection via environment variables
+
+
