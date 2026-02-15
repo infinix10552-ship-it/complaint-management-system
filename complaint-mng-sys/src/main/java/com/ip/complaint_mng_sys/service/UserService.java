@@ -96,6 +96,6 @@ public class UserService {
                 "role", user.getRole().name()
         );
 
-        return jwtService.generateToken(user);
+        return jwtService.generateToken(claims, user);
     }
 }

@@ -26,16 +26,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // Enable CORS!
-                .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults()) // Enable CORS with default configuration
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless API
                 .authorizeHttpRequests(auth -> auth
+                        // Public endpoints - no authentication required
+                        .requestMatchers("/auth/login", "/auth/register").permitAll()
                         .requestMatchers("/auth/**").permitAll()
+                        // Admin endpoints - requires ADMIN role
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        // All other endpoints require authentication
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                // Add JWT filter before authentication filter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
