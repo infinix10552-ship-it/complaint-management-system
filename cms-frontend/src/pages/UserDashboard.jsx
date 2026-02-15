@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { LogOut, Plus, FileText, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import { complaintService } from '../services/complaint.service.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -7,15 +8,18 @@ const UserDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [form, setForm] = useState({ title: '', description: '', category: 'Electrical' });
   const [status, setStatus] = useState({ type: '', msg: '' });
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (user?.id) fetchMyComplaints();
-  }, [user]);
+    if (user?.id) {
+      fetchMyComplaints();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const fetchMyComplaints = async () => {
     try {
       const res = await complaintService.getMyComplaints(user.id);
-      // Ensure res is an array, handle cases where data might be nested
       setComplaints(Array.isArray(res) ? res : []);
     } catch (err) {
       console.error(err);
@@ -24,82 +28,235 @@ const UserDashboard = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus({ type: '', msg: '' }); // Clear previous status
+    setStatus({ type: '', msg: '' });
+    setIsLoading(true);
     try {
-      // Backend createComplaint requires user_id
       await complaintService.createComplaint(form.title, form.description, form.category, user.id);
-      setStatus({ type: 'success', msg: 'Complaint filed successfully' });
+      setStatus({ type: 'success', msg: '✓ Complaint filed successfully!' });
       setForm({ title: '', description: '', category: 'Electrical' });
       fetchMyComplaints();
     } catch (err) {
       console.error(err);
-      setStatus({ type: 'error', msg: 'Failed to file complaint. Please try again.' });
+      setStatus({ type: 'error', msg: '✗ Failed to file complaint. Please try again.' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleLogout = () => {
+    logoutUser();
+  };
+
+  const getStatusBadge = (status) => {
+    switch (status) {
+      case 'RESOLVED':
+      case 'CLOSED':
+        return <span className="badge-success">✓ {status}</span>;
+      case 'IN_PROGRESS':
+        return <span className="badge-info">⟳ {status}</span>;
+      case 'OPEN':
+        return <span className="badge-pending">○ {status}</span>;
+      case 'REJECTED':
+        return <span className="badge-error">✕ {status}</span>;
+      default:
+        return <span className="badge-pending">{status}</span>;
+    }
+  };
+
+  const stats = [
+    { label: 'Total Complaints', value: complaints.length, icon: FileText, color: 'from-blue-500 to-indigo-600' },
+    { label: 'Resolved', value: complaints.filter(c => c.status === 'RESOLVED').length, icon: CheckCircle, color: 'from-emerald-500 to-green-600' },
+    { label: 'In Progress', value: complaints.filter(c => c.status === 'IN_PROGRESS').length, icon: Clock, color: 'from-amber-500 to-orange-600' },
+    { label: 'Pending', value: complaints.filter(c => c.status === 'OPEN').length, icon: AlertCircle, color: 'from-purple-500 to-pink-600' },
+  ];
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow p-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-600">Complaint System</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-gray-600">Welcome, {user?.sub}</span>
-          <button onClick={logoutUser} className="text-red-500 hover:text-red-700">Logout</button>
+      {/* Sidebar */}
+      <div className="fixed left-0 top-0 w-64 h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white p-6 shadow-2xl z-50">
+        <div className="flex items-center gap-3 mb-12">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center font-bold text-lg">
+            CS
+          </div>
+          <div>
+            <h1 className="text-lg font-bold">Complaint Sys</h1>
+            <p className="text-xs text-gray-400">Management</p>
+          </div>
         </div>
-      </nav>
 
-      <div className="container mx-auto p-8 max-w-4xl">
-        <div className="bg-white p-6 rounded shadow mb-8">
-          <h2 className="text-lg font-semibold mb-4">File a New Complaint</h2>
-          {status.msg && <div className={`p-2 mb-4 rounded ${status.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{status.msg}</div>}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <input 
-                className="border p-2 rounded w-full" 
-                placeholder="Title" 
-                value={form.title}
-                onChange={e => setForm({...form, title: e.target.value})} 
-                required 
-              />
-              <select 
-                className="border p-2 rounded w-full"
-                value={form.category}
-                onChange={e => setForm({...form, category: e.target.value})}
-              >
-                <option>Electrical</option>
-                <option>Plumbing</option>
-                <option>Internet</option>
-                <option>Other</option>
-              </select>
+        <nav className="space-y-2 mb-12">
+          <a href="#" className="block px-4 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-600 font-semibold">
+            Dashboard
+          </a>
+          <a href="#complaints" className="block px-4 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+            My Complaints
+          </a>
+        </nav>
+
+        <div className="absolute bottom-6 left-6 right-6">
+          <div className="mb-4 p-4 bg-gray-700 rounded-lg">
+            <p className="text-xs text-gray-400">Logged in as</p>
+            <p className="text-sm font-semibold truncate">{user?.sub || 'User'}</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-red-600 hover:bg-red-700 font-semibold transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="ml-64 p-8">
+        {/* Top Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
+          <p className="text-gray-600">Welcome to your complaint management center</p>
+        </div>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {stats.map((stat, idx) => {
+            const Icon = stat.icon;
+            return (
+              <div key={idx} className="stat-card">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm font-medium mb-1">{stat.label}</p>
+                    <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                  </div>
+                  <div className={`p-3 rounded-lg bg-gradient-to-r ${stat.color} text-white`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* New Complaint Form */}
+        <div className="card mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-indigo-100">
+              <Plus className="w-5 h-5 text-indigo-600" />
             </div>
-            <textarea 
-              className="border p-2 rounded w-full" 
-              rows="3" 
-              placeholder="Description"
-              value={form.description}
-              onChange={e => setForm({...form, description: e.target.value})}
-              required
-            />
-            <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Submit</button>
+            <h2 className="text-2xl font-bold text-gray-900">File a New Complaint</h2>
+          </div>
+
+          {status.msg && (
+            <div className={`mb-6 p-4 rounded-lg flex items-start gap-3 ${
+              status.type === 'success' 
+                ? 'bg-emerald-50 border border-emerald-200' 
+                : 'bg-red-50 border border-red-200'
+            }`}>
+              {status.type === 'success' ? (
+                <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              )}
+              <p className={status.type === 'success' ? 'text-emerald-700' : 'text-red-700'}>
+                {status.msg}
+              </p>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Title</label>
+                <input
+                  type="text"
+                  placeholder="Brief title of your complaint"
+                  value={form.title}
+                  onChange={e => setForm({...form, title: e.target.value})}
+                  required
+                  className="input-field"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Category</label>
+                <select
+                  value={form.category}
+                  onChange={e => setForm({...form, category: e.target.value})}
+                  className="input-field"
+                >
+                  <option>Electrical</option>
+                  <option>Plumbing</option>
+                  <option>Internet</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Description</label>
+              <textarea
+                rows="4"
+                placeholder="Provide details about your complaint..."
+                value={form.description}
+                onChange={e => setForm({...form, description: e.target.value})}
+                required
+                className="input-field resize-none"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              {isLoading ? 'Filing Complaint...' : 'File Complaint'}
+            </button>
           </form>
         </div>
 
-        <h2 className="text-xl font-bold mb-4">My Complaints</h2>
-        <div className="grid gap-4">
+        {/* Complaints Table */}
+        <div className="card">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">My Complaints</h2>
+
           {complaints.length > 0 ? (
-            complaints.map(c => (
-              <div key={c.id} className="bg-white p-4 rounded shadow border-l-4 border-blue-500">
-                <div className="flex justify-between">
-                  <h3 className="font-bold">{c.title}</h3>
-                  <span className={`px-2 py-1 rounded text-xs font-bold ${
-                    c.status === 'RESOLVED' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                  }`}>{c.status}</span>
-                </div>
-                <p className="text-gray-600 mt-1">{c.description}</p>
-                <div className="mt-2 text-xs text-gray-400">Category: {c.category} | Date: {c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'}</div>
-              </div>
-            ))
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="table-header">
+                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Title</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Category</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Status</th>
+                    <th className="px-6 py-4 text-left font-semibold text-gray-700">Date</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {complaints.map(complaint => (
+                    <tr key={complaint.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-semibold text-gray-900">{complaint.title}</p>
+                          <p className="text-sm text-gray-600 mt-1">{complaint.description.substring(0, 60)}...</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                          {complaint.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {getStatusBadge(complaint.status)}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {complaint.createdAt ? new Date(complaint.createdAt).toLocaleDateString() : 'N/A'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
-            <p className="text-gray-500">No complaints found.</p>
+            <div className="text-center py-12">
+              <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <p className="text-gray-500 font-medium">No complaints filed yet</p>
+              <p className="text-gray-400 text-sm">Start by filing your first complaint above</p>
+            </div>
           )}
         </div>
       </div>
@@ -108,3 +265,5 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+
+
