@@ -6,12 +6,35 @@ import Register from './pages/Register';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import PrivateRoute from './components/PrivateRoute';
+import LandingPage from './pages/LandingPage';
 
-// Component to decide where to go if user is already logged in
-const DashboardRedirect = () => {
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div style={{padding: 20, color: 'red'}}><h1>Error</h1><pre>{this.state.error.message}</pre><pre>{this.state.error.stack}</pre></div>;
+    }
+    return this.props.children; 
+  }
+}
+
+// Component to decide where to go
+const IndexRoute = () => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" />;
-  return user.role === 'ADMIN' ? <Navigate to="/admin" /> : <Navigate to="/dashboard" />;
+  if (user) {
+    return user.role === 'ADMIN' ? <Navigate to="/admin" /> : <Navigate to="/dashboard" />;
+  }
+  return (
+    <ErrorBoundary>
+      <LandingPage />
+    </ErrorBoundary>
+  );
 };
 
 function App() {
@@ -21,7 +44,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/" element={<DashboardRedirect />} />
+          <Route path="/" element={<IndexRoute />} />
           
           <Route path="/dashboard" element={
             <PrivateRoute requiredRole="USER">

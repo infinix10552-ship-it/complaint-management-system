@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, Lock, AlertCircle, CheckCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
+import { motion as Motion } from 'framer-motion';
 import { authService } from '../services/auth.service';
 
 const Register = () => {
@@ -36,127 +37,115 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 via-indigo-500 to-blue-700 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl"></div>
-
-      <div className="w-full max-w-md z-10">
-        {/* Logo/Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-md rounded-full mb-4">
-            <User className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Create Account</h1>
-          <p className="text-blue-100">Join our complaint management system</p>
+    <div className="min-h-screen bg-[#F4F5F7] flex flex-col items-center justify-center p-4 font-sans selection:bg-[#0052CC] selection:text-white relative">
+      <div className="absolute inset-0 bg-[url('https://www.toptal.com/designers/subtlepatterns/uploads/dot-grid.png')] opacity-20 z-0"></div>
+      
+      <Motion.div 
+        className="w-full max-w-[400px] z-10"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="text-center mb-8 flex flex-col items-center">
+          <Link to="/" className="flex items-center gap-2 mb-6">
+            <div className="w-10 h-10 rounded bg-[#0052CC] flex items-center justify-center text-white font-bold text-2xl">
+              C
+            </div>
+            <span className="text-3xl font-bold tracking-tight text-[#172B4D]">CivicResolve</span>
+          </Link>
+          <h1 className="text-2xl font-bold text-[#172B4D] mb-1">Sign up for your account</h1>
         </div>
 
-        {/* Glassmorphism Card */}
-        <div className="glass-card p-8 mb-6">
-          {/* Success Alert */}
+        <div className="bg-white rounded shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#DFE1E6] p-8 mb-6">
           {success && (
-            <div className="mb-6 p-4 bg-emerald-50/80 backdrop-blur-sm border border-emerald-200 rounded-lg flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
-              <p className="text-emerald-700 text-sm font-medium">{success}</p>
-            </div>
+            <Motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mb-6 p-4 bg-[#E3FCEF] border border-[#79F2C0] rounded flex items-start gap-3"
+            >
+              <CheckCircle className="w-5 h-5 text-[#006644] flex-shrink-0 mt-0.5" />
+              <p className="text-[#006644] text-sm font-medium">{success}</p>
+            </Motion.div>
           )}
 
-          {/* Error Alert */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50/80 backdrop-blur-sm border border-red-200 rounded-lg flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-red-700 text-sm font-medium">{error}</p>
-            </div>
+            <Motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              className="mb-6 p-4 bg-[#FFEBE6] border border-[#FF8F73] rounded flex items-start gap-3"
+            >
+              <AlertCircle className="w-5 h-5 text-[#DE350B] flex-shrink-0 mt-0.5" />
+              <p className="text-[#DE350B] text-sm font-medium">{error}</p>
+            </Motion.div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Full Name Field */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Full Name</label>
-              <div className="relative">
-                <User className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="John Doe"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="input-field pl-12"
-                />
-              </div>
+              <label className="block text-[#42526E] font-bold text-sm mb-1.5">Full name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your full name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full px-3 py-2.5 bg-[#FAFBFC] border-2 border-[#DFE1E6] rounded text-[#172B4D] focus:bg-white focus:border-[#4C9AFF] focus:outline-none transition-colors hover:bg-[#EBECF0]"
+              />
             </div>
 
-            {/* Email Field */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="your@email.com"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="input-field pl-12"
-                />
-              </div>
+              <label className="block text-[#42526E] font-bold text-sm mb-1.5">Email address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="w-full px-3 py-2.5 bg-[#FAFBFC] border-2 border-[#DFE1E6] rounded text-[#172B4D] focus:bg-white focus:border-[#4C9AFF] focus:outline-none transition-colors hover:bg-[#EBECF0]"
+              />
             </div>
 
-            {/* Password Field */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Password</label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="••••••••"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="input-field pl-12"
-                />
-              </div>
-              <p className="text-gray-500 text-xs mt-1">At least 6 characters recommended</p>
+              <label className="block text-[#42526E] font-bold text-sm mb-1.5">Password</label>
+              <input
+                type="password"
+                name="password"
+                placeholder="Create a password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="w-full px-3 py-2.5 bg-[#FAFBFC] border-2 border-[#DFE1E6] rounded text-[#172B4D] focus:bg-white focus:border-[#4C9AFF] focus:outline-none transition-colors hover:bg-[#EBECF0]"
+              />
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-[#0052CC] hover:bg-[#0047B3] text-white font-bold py-2.5 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-2"
             >
-              {isLoading ? 'Creating Account...' : 'Create Account'}
+              {isLoading ? 'Signing up...' : 'Sign up'}
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-4">
-            <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-gray-500 text-sm">Already registered?</span>
-            <div className="flex-1 h-px bg-gray-300"></div>
+          <div className="mt-6 pt-6 border-t border-[#DFE1E6] text-center">
+            <p className="text-[#5E6C84] text-sm">
+              Already have an account?{' '}
+              <Link to="/login" className="text-[#0052CC] font-medium hover:underline">
+                Log in
+              </Link>
+            </p>
           </div>
-
-          {/* Login Link */}
-          <Link
-            to="/login"
-            className="btn-secondary w-full text-center block"
-          >
-            Back to Login
-          </Link>
         </div>
-
-        {/* Footer */}
-        <p className="text-center text-blue-100 text-sm">
-          Secure complaint management system
-        </p>
-      </div>
+        
+        <div className="text-center flex justify-center space-x-4 text-xs text-[#5E6C84]">
+          <a href="#" className="hover:underline hover:text-[#172B4D]">Privacy Policy</a>
+          <span>•</span>
+          <a href="#" className="hover:underline hover:text-[#172B4D]">User Notice</a>
+        </div>
+      </Motion.div>
     </div>
   );
 };
 
 export default Register;
-
-
